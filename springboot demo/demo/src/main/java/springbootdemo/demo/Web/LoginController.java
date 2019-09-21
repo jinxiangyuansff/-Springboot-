@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController
 {
 
-  @RequestMapping("/idnex")
+  @RequestMapping("/index")
    public String home()
    {
        return "OK";

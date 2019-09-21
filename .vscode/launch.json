@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - DemoApplication",
+            "request": "launch",
+            "mainClass": "springbootdemo.demo.DemoApplication",
+            "projectName": "demo"
+        }
+    ]
+}
