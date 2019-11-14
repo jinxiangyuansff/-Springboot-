@@ -20,7 +20,9 @@ public class DiscussPostService
 // 查询行数的方法
 public int findDiscussPostRows(int userId) {
     return discussPostMapper.selectDiscussPostRows(userId);
+
 }
+
 
 
 }
