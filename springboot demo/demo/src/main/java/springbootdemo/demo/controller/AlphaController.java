@@ -1,4 +1,4 @@
-package springbootdemo.demo.Web;
+package springbootdemo.demo.controller;
 
 import java.util.HashMap;
 import java.util.Map;
