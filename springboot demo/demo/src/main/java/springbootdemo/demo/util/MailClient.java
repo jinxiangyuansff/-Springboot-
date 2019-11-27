@@ -27,7 +27,6 @@ public class MailClient
     public void sendMail(String to,String subject,String Content)
     {
          try{  
-         
            MimeMessage message = mailSender.createMimeMessage();
            MimeMessageHelper helper = new MimeMessageHelper(message);
            helper.setFrom(from);
@@ -36,7 +35,6 @@ public class MailClient
            // 加了true，支持发送html邮件
            helper.setText(Content, true);
            mailSender.send(helper.getMimeMessage());
-
          }catch(MessagingException e)
            {
             logger.error("发送邮件失败:" + e.getMessage());
