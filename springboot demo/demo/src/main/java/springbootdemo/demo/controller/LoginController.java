@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -108,8 +109,9 @@ public class LoginController implements CommunityConstant
             ImageIO.write(image, "png", os);
         } catch (IOException e) {
             logger.error("响应验证码失败" + e.getMessage());
-        }
-
+        }  
+          }
+            
         @RequestMapping(path = "/login", method = RequestMethod.POST)
         public String login(String username, String password, String code, boolean rememberme, Model model, HttpSession httpSession, HttpServletResponse httpServletResponse) {
                 // 检查验证码
@@ -137,7 +139,14 @@ public class LoginController implements CommunityConstant
                     return "/site/login";
                 }
 
-   
+              }
+
+              @RequestMapping(path = "/logout", method = RequestMethod.GET)
+              public String logout(@CookieValue("ticket") String ticket) {
+                  userService.logout(ticket);
+                  return "redirect:/login";
+              }
+
 
 
 
