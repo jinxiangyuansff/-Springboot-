@@ -6,26 +6,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-//import org.thymeleaf.TemplateEngine;
 
-import springbootdemo.demo.util.MailClient;
+import springbootdemo.demo.util.SensitiveFilter;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextConfiguration(classes = DemoApplication.class)
-
-public class MailTest
+public class wordTest
 {
     @Autowired
-    private MailClient mailClient;
-	// 主动的调用thymeleaf模板引擎
-   // @Autowired
-    //private TemplateEngine templateEngine;
+    private SensitiveFilter sensitiveFilter;
+
+
 
     @Test
-    public void testTextMail() {
-        mailClient.sendMail("474498570@qq.com","hello","hello");
+    public void testWord()
+    {
+        String text1 = "这里可以赌博,可以嫖娼,可以吸毒,可以开票,哈哈哈!";
+        text1 = sensitiveFilter.filter(text1) ;
+        System.out.println(text1); 
     }
+  
+   
 
-    
 }

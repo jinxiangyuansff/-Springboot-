@@ -11,7 +11,10 @@ import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+
+@Component
 public class SensitiveFilter
 {
     private static final Logger logger = LoggerFactory.getLogger(SensitiveFilter.class);
@@ -27,7 +30,7 @@ public class SensitiveFilter
     @PostConstruct
     public void init() {
         try (
-                InputStream is = this.getClass().getClassLoader().getResourceAsStream("sensitive-words.txt");
+                InputStream is = this.getClass().getClassLoader().getResourceAsStream("Sensitive.txt");
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         ) {
             String keyword;
