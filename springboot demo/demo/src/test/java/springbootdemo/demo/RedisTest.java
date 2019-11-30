@@ -23,6 +23,7 @@ public class RedisTest
     private RedisTemplate redisTemplate;
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testStrings() {
         String redisKey = "test:count";
         redisTemplate.opsForValue().set(redisKey, 1);
@@ -32,6 +33,7 @@ public class RedisTest
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testHashes() {
         String redisKey = "test:user";
 
@@ -43,6 +45,7 @@ public class RedisTest
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testLists() {
         String redisKey = "test:ids";
 
@@ -61,6 +64,7 @@ public class RedisTest
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testSets() {
         String redisKey = "test:teachers";
 
@@ -72,6 +76,7 @@ public class RedisTest
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testSortedSets() {
         String redisKey = "test:students";
 
@@ -92,6 +97,7 @@ public class RedisTest
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testKeys() {
         redisTemplate.delete("test:user");
 
@@ -115,6 +121,7 @@ public class RedisTest
 
     // Redis编程式事务，并不一定满足我们之前说过的事务，因为不是关系型数据库
     @Test
+    @SuppressWarnings("unchecked")
     public void testTransactional() {
         Object obj = redisTemplate.execute(new SessionCallback() {
             @Override
