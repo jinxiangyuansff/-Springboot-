@@ -21,7 +21,7 @@
                     </if>
                     order by type desc, create_time desc
                     limit #{offset}, #{limit}
-                </select>
+                </select> 
 
                 <select id="selectDiscussPostById" resultType="DiscussPost">
                     select <include refid="selectFields"></include>
