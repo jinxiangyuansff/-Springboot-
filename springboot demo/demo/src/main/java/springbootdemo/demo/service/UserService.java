@@ -1,13 +1,20 @@
 package springbootdemo.demo.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthoritiesContainer;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -19,6 +26,7 @@ import springbootdemo.demo.model.User;
 import springbootdemo.demo.util.CommunityConstant;
 import springbootdemo.demo.util.CommunityUtil;
 import springbootdemo.demo.util.MailClient;
+import springbootdemo.demo.util.RedisKeyUtil;
 
 @Service 
 public class UserService implements CommunityConstant
@@ -29,8 +37,12 @@ public class UserService implements CommunityConstant
    @Autowired
     private MailClient mailClient;
   
-    @Autowired
-    private LoginTicketMapper loginTicketMapper;
+    //用redis改进
+   // @Autowired
+   // private LoginTicketMapper loginTicketMapper;
+
+   @Autowired
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private TemplateEngine templateEngine;
@@ -152,25 +164,87 @@ public class UserService implements CommunityConstant
     loginTicket.setTicket(CommunityUtil.generateUUID());
     loginTicket.setStatus(0);
     loginTicket.setExpired(new Date(System.currentTimeMillis() + expiredSeconds * 1000));
-    loginTicketMapper.insertLoginTicket(loginTicket);
+    //loginTicketMapper.insertLoginTicket(loginTicket);
+    String redisKey = RedisKeyUtil.getTicketKey(loginTicket.getTicket());
+        redisTemplate.opsForValue().set(redisKey, loginTicket);
 
     map.put("ticket", loginTicket.getTicket());
     return map;
    }
 
+
+
    public void logout(String ticket)
     {
-        loginTicketMapper.updateStatus(ticket, 1);
+        //loginTicketMapper.updateStatus(ticket, 1);
+        String redisKey = RedisKeyUtil.getTicketKey(ticket);
+        LoginTicket loginTicket = (LoginTicket) redisTemplate.opsForValue().get(redisKey);
+        loginTicket.setStatus(1);
+        redisTemplate.opsForValue().set(redisKey, loginTicket);
 
     }
 
     public LoginTicket findLoginTicket(String ticket) {
-             return loginTicketMapper.selectByTicket(ticket);
+            // return loginTicketMapper.selectByTicket(ticket);
+            String redisKey = RedisKeyUtil.getTicketKey(ticket);
+            return (LoginTicket) redisTemplate.opsForValue().get(redisKey);
             }
 
     public int updateHeader(int userId, String headerUrl) {
                 return userMapper.updateHeader(userId, headerUrl);
             }
+
+            public User findUserByName(String name) {
+                return userMapper.selectByName(name);
+            }
+
+
+            // 1.优先从缓存中取值
+    private User getCache(int userId) {
+        String redisKey = RedisKeyUtil.getUserKey(userId);
+        return (User) redisTemplate.opsForValue().get(redisKey);
+    }
+
+    // 2.取不到时初始化缓存数据
+    private User initCache(int userId) {
+//        System.out.println(111);
+        User user = userMapper.selectById(userId);
+        String redisKey = RedisKeyUtil.getUserKey(userId);
+        redisTemplate.opsForValue().set(redisKey, user, 3600, TimeUnit.SECONDS);
+        return user;
+    }
+
+    // 3.数据变更时清除缓存数据
+    private void clearCache(int userId) {
+        String redisKey = RedisKeyUtil.getUserKey(userId);
+        redisTemplate.delete(redisKey);
+    }
+
+    
+
+    // 获得权限
+    public Collection<? extends GrantedAuthority> getAuthorities(int userId) {
+        User user = this.findUserById(userId);
+
+        List<GrantedAuthority> list = new ArrayList<>();
+        list.add(new GrantedAuthority() {
+
+            @Override
+            public String getAuthority() {
+                switch (user.getType()) {
+                    case 1:
+                        return AUTHORITY_ADMIN;
+                    case 2:
+                        return AUTHORITY_MODERATOR;
+                    default:
+                        return AUTHORITY_USER;
+                }
+            }
+        });
+        return list;
+    }
+            
+            
 
             
  }
